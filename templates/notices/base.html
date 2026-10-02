@@ -28,7 +28,7 @@
   </script>
 
   <style>
-    /* ===== ANTI-OVERSCROLL (iOS FIX) — FIXED FOOTER LAYOUT ===== */
+    /* ===== ANTI-OVERSCROLL (iOS FIX) ===== */
     html, body {
       width: 100%;
       height: 100%;
@@ -47,14 +47,14 @@
       will-change: transform;
     }
 
-    /* Scroll container now leaves room for the fixed footer */
     .scroll-container {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      bottom: 53px; /* height of the footer */
+      bottom: 0;
       width: 100%;
+      height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
@@ -78,29 +78,34 @@
       .scroll-container {
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: none;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
       }
     }
 
-    /* Fixed footer at the bottom of the viewport */
-    .fixed-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 53px;
-      z-index: 40;
-      background: #1f2937;
-      color: #d1d5db;
+    /* ===== STICKY FOOTER LAYOUT =====
+       The inner wrapper fills at least the full height of the scroll area.
+       The main element grows to push the footer to the bottom when content is short.
+       When content is long, the wrapper grows taller than the viewport and the footer scrolls naturally. */
+    .page-wrapper {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      border-top: 1px solid #374151;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .page-main {
+      flex: 1 0 auto;
+      width: 100%;
     }
 
     /* ===== SCROLL BOUNDARY INDICATOR ===== */
     .scroll-boundary {
       position: fixed;
-      bottom: 53px; /* sits just above the footer */
+      bottom: 0;
       left: 0;
       width: 100%;
       height: 3px;
@@ -121,19 +126,6 @@
       overflow-wrap: break-word;
       word-break: break-word;
     }
-
-    /* Small phones — tighter footer */
-    @media (max-width: 380px) {
-      .scroll-container {
-        bottom: 45px;
-      }
-      .fixed-footer {
-        height: 45px;
-      }
-      .scroll-boundary {
-        bottom: 45px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -141,183 +133,190 @@
   <!-- Scroll Boundary Indicator -->
   <div id="scrollBoundary" class="scroll-boundary"></div>
 
-  <!-- Scroll Container (everything EXCEPT the footer) -->
+  <!-- Scroll Container -->
   <div class="scroll-container" id="scrollContainer">
 
-    <!-- SCHOOL BANNER (above navbar) -->
-    <div class="bg-gray-900 text-gray-200 border-b border-gray-800 hidden sm:block">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-        <div class="flex items-center justify-between gap-4 text-xs">
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="text-base">🎓</span>
-            <span class="font-semibold text-white truncate">
-              Global Wealth University
-            </span>
-            <span class="text-gray-500 hidden md:inline">|</span>
-            <span class="text-gray-400 hidden md:inline truncate">
-              Department of Computer Science
-            </span>
-          </div>
-          <div class="text-gray-400 whitespace-nowrap hidden md:block">
-            Official Notice Board
+    <!-- Page Wrapper (flex column, min-height 100%) -->
+    <div class="page-wrapper">
+
+      <!-- SCHOOL BANNER -->
+      <div class="bg-gray-900 text-gray-200 border-b border-gray-800 hidden sm:block">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+          <div class="flex items-center justify-between gap-4 text-xs">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-base">🎓</span>
+              <span class="font-semibold text-white truncate">
+                Global Wealth University
+              </span>
+              <span class="text-gray-500 hidden md:inline">|</span>
+              <span class="text-gray-400 hidden md:inline truncate">
+                Department of Computer Science
+              </span>
+            </div>
+            <div class="text-gray-400 whitespace-nowrap hidden md:block">
+              Official Notice Board
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- NAVBAR -->
-    <nav class="bg-uou text-white shadow-lg sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16 gap-3">
+      <!-- NAVBAR -->
+      <nav class="bg-uou text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center h-16 gap-3">
 
-          <!-- Brand -->
-          <a href="{% url 'dashboard' %}" class="flex items-center gap-3 min-w-0 flex-shrink">
-            <div class="w-11 h-11 bg-white rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-              <img src="{% static 'img/Global-wealth-university.PNG' %}"
-                   alt="GWU Logo"
-                   class="w-full h-full object-contain p-0.5">
+            <!-- Brand -->
+            <a href="{% url 'dashboard' %}" class="flex items-center gap-3 min-w-0 flex-shrink">
+              <div class="w-11 h-11 bg-white rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                <img src="{% static 'img/Global-wealth-university.PNG' %}"
+                     alt="GWU Logo"
+                     class="w-full h-full object-contain p-0.5">
+              </div>
+              <div class="min-w-0 hidden xs:block sm:block">
+                <div class="font-bold text-sm sm:text-lg leading-tight truncate">Global Wealth University</div>
+                <div class="text-xs text-indigo-200">Notice Board</div>
+              </div>
+            </a>
+
+            <!-- Desktop menu -->
+            <div class="hidden md:flex items-center gap-4 shrink-0">
+              <a href="{% url 'dashboard' %}" class="hover:text-indigo-200 text-sm whitespace-nowrap">Home</a>
+
+              {% if user.is_authenticated and user.is_staff %}
+                <a href="{% url 'admin_dashboard' %}" class="hover:text-indigo-200 text-sm whitespace-nowrap">
+                  Admin Panel
+                </a>
+              {% endif %}
+
+              {% if user.is_authenticated %}
+                <span class="text-sm text-indigo-200 truncate max-w-[120px]">
+                  Hi, {{ user.username }}
+                </span>
+                <form method="post" action="{% url 'account_logout' %}" class="inline">
+                  {% csrf_token %}
+                  <button class="bg-white text-uou px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-100 whitespace-nowrap">
+                    Logout
+                  </button>
+                </form>
+              {% else %}
+                <a href="{% url 'account_login' %}"
+                   class="bg-white text-uou px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-100 whitespace-nowrap">
+                  Login
+                </a>
+              {% endif %}
             </div>
-            <div class="min-w-0 hidden xs:block sm:block">
-              <div class="font-bold text-sm sm:text-lg leading-tight truncate">Global Wealth University</div>
-              <div class="text-xs text-indigo-200">Notice Board</div>
-            </div>
-          </a>
 
-          <!-- Desktop menu -->
-          <div class="hidden md:flex items-center gap-4 shrink-0">
-            <a href="{% url 'dashboard' %}" class="hover:text-indigo-200 text-sm whitespace-nowrap">Home</a>
+            <!-- Mobile: quick action + hamburger -->
+            <div class="flex md:hidden items-center gap-2 shrink-0">
+              {% if user.is_authenticated %}
+                <form method="post" action="{% url 'account_logout' %}" class="inline">
+                  {% csrf_token %}
+                  <button class="bg-white text-uou px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-indigo-100 whitespace-nowrap">
+                    Logout
+                  </button>
+                </form>
+              {% else %}
+                <a href="{% url 'account_login' %}"
+                   class="bg-white text-uou px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-indigo-100 whitespace-nowrap">
+                  Login
+                </a>
+              {% endif %}
+
+              <button type="button" id="mobile-menu-toggle"
+                      aria-label="Open menu"
+                      class="p-1.5 rounded-lg hover:bg-uou-dark focus:outline-none">
+                <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Mobile dropdown -->
+        <div id="mobile-menu" class="md:hidden hidden bg-uou-dark border-t border-indigo-700">
+          <div class="px-4 py-3 space-y-1">
+
+            {% if user.is_authenticated %}
+              <div class="text-sm text-indigo-200 px-3 py-2 border-b border-indigo-700 mb-2">
+                Signed in as <strong class="text-white">{{ user.username }}</strong>
+              </div>
+            {% endif %}
+
+            <a href="{% url 'dashboard' %}"
+               class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
+              🏠 Home
+            </a>
 
             {% if user.is_authenticated and user.is_staff %}
-              <a href="{% url 'admin_dashboard' %}" class="hover:text-indigo-200 text-sm whitespace-nowrap">
-                Admin Panel
+              <a href="{% url 'admin_dashboard' %}"
+                 class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
+                ⚙️ Admin Panel
+              </a>
+              <a href="{% url 'manage_notices' %}"
+                 class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
+                📋 Manage Notices
+              </a>
+              <a href="{% url 'category_list' %}"
+                 class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
+                🏷️ Categories
               </a>
             {% endif %}
 
             {% if user.is_authenticated %}
-              <span class="text-sm text-indigo-200 truncate max-w-[120px]">
-                Hi, {{ user.username }}
-              </span>
-              <form method="post" action="{% url 'account_logout' %}" class="inline">
+              <form method="post" action="{% url 'account_logout' %}" class="pt-1">
                 {% csrf_token %}
-                <button class="bg-white text-uou px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-100 whitespace-nowrap">
-                  Logout
+                <button type="submit"
+                        class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium bg-white text-uou hover:bg-indigo-100">
+                  🚪 Logout
                 </button>
               </form>
             {% else %}
               <a href="{% url 'account_login' %}"
-                 class="bg-white text-uou px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-100 whitespace-nowrap">
-                Login
+                 class="block px-3 py-2.5 rounded-lg text-sm font-medium bg-white text-uou hover:bg-indigo-100">
+                🔐 Login
               </a>
-            {% endif %}
-          </div>
-
-          <!-- Mobile: quick action + hamburger -->
-          <div class="flex md:hidden items-center gap-2 shrink-0">
-            {% if user.is_authenticated %}
-              <form method="post" action="{% url 'account_logout' %}" class="inline">
-                {% csrf_token %}
-                <button class="bg-white text-uou px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-indigo-100 whitespace-nowrap">
-                  Logout
-                </button>
-              </form>
-            {% else %}
-              <a href="{% url 'account_login' %}"
-                 class="bg-white text-uou px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-indigo-100 whitespace-nowrap">
-                Login
+              <a href="{% url 'account_signup' %}"
+                 class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
+                ✍️ Sign Up
               </a>
             {% endif %}
 
-            <button type="button" id="mobile-menu-toggle"
-                    aria-label="Open menu"
-                    class="p-1.5 rounded-lg hover:bg-uou-dark focus:outline-none">
-              <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
-
         </div>
-      </div>
+      </nav>
 
-      <!-- Mobile dropdown -->
-      <div id="mobile-menu" class="md:hidden hidden bg-uou-dark border-t border-indigo-700">
-        <div class="px-4 py-3 space-y-1">
-
-          {% if user.is_authenticated %}
-            <div class="text-sm text-indigo-200 px-3 py-2 border-b border-indigo-700 mb-2">
-              Signed in as <strong class="text-white">{{ user.username }}</strong>
+      {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 w-full">
+          {% for message in messages %}
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-3 rounded mt-4 mb-2 break-words">
+              {{ message }}
             </div>
-          {% endif %}
-
-          <a href="{% url 'dashboard' %}"
-             class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
-            🏠 Home
-          </a>
-
-          {% if user.is_authenticated and user.is_staff %}
-            <a href="{% url 'admin_dashboard' %}"
-               class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
-              ⚙️ Admin Panel
-            </a>
-            <a href="{% url 'manage_notices' %}"
-               class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
-              📋 Manage Notices
-            </a>
-            <a href="{% url 'category_list' %}"
-               class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
-              🏷️ Categories
-            </a>
-          {% endif %}
-
-          {% if user.is_authenticated %}
-            <form method="post" action="{% url 'account_logout' %}" class="pt-1">
-              {% csrf_token %}
-              <button type="submit"
-                      class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium bg-white text-uou hover:bg-indigo-100">
-                🚪 Logout
-              </button>
-            </form>
-          {% else %}
-            <a href="{% url 'account_login' %}"
-               class="block px-3 py-2.5 rounded-lg text-sm font-medium bg-white text-uou hover:bg-indigo-100">
-              🔐 Login
-            </a>
-            <a href="{% url 'account_signup' %}"
-               class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
-              ✍️ Sign Up
-            </a>
-          {% endif %}
-
+          {% endfor %}
         </div>
-      </div>
-    </nav>
+      {% endif %}
 
-    {% if messages %}
-      <div class="max-w-7xl mx-auto px-4 w-full">
-        {% for message in messages %}
-          <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-3 rounded mt-4 mb-2 break-words">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+      <!-- MAIN (grows to push footer down when content is short) -->
+      <main class="page-main overflow-x-hidden">
+        {% block content %}{% endblock %}
+      </main>
 
-    <main class="w-full overflow-x-hidden">
-      {% block content %}{% endblock %}
-    </main>
+      <!-- FOOTER (always at bottom, scrolls with content when long) -->
+      <footer class="bg-gray-800 text-gray-300 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+          © {% now "Y" %} Global Wealth University — Departmental Notice Board
+        </div>
+      </footer>
+
+    </div>
+    <!-- End Page Wrapper -->
 
   </div>
   <!-- End Scroll Container -->
-
-  <!-- ===== FIXED FOOTER (always visible at the bottom) ===== -->
-  <footer class="fixed-footer">
-    <div class="max-w-7xl mx-auto px-4 text-center text-sm">
-      © {% now "Y" %} Global Wealth University — Departmental Notice Board
-    </div>
-  </footer>
 
   <script src="{% static 'js/main.js' %}"></script>
 
@@ -374,14 +373,12 @@
             const scrollHeight = container.scrollHeight;
             const clientHeight = container.clientHeight;
 
-            // At top and trying to scroll up (pulling down)
             if (scrollTop <= 0 && direction > 0) {
               e.preventDefault();
               container.scrollTop = 0;
               return;
             }
 
-            // At bottom and trying to scroll down (pushing up)
             if (scrollTop + clientHeight >= scrollHeight - 1 && direction < 0) {
               e.preventDefault();
               container.scrollTop = scrollHeight - clientHeight;
@@ -392,7 +389,7 @@
           }, { passive: false });
         }
 
-        // Scroll boundary indicator — shown when near the bottom of scrollable content
+        // Scroll boundary indicator
         scrollContainer.addEventListener('scroll', function() {
           const distanceFromBottom = this.scrollHeight - (this.scrollTop + this.clientHeight);
           const boundary = document.getElementById('scrollBoundary');
