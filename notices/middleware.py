@@ -16,7 +16,7 @@ class DynamicSiteDomainMiddleware:
             site = Site.objects.get(id=1)
             if site.domain != host:
                 site.domain = host
-                site.name = 'UOU Notice Board'
+                site.name = 'Global Wealth University Notice Board'
                 site.save()
         except Site.DoesNotExist:
             pass

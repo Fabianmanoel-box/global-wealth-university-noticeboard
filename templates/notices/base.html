@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>UOU Notice Board · Upgrade in Progress</title>
+  <title>{% block title %}GWU Notice Board{% endblock %}</title>
 
-  <!-- Favicon (using a placeholder path — adjust to your static file if needed) -->
-  <link rel="icon" type="image/png" href="{% static 'img/UOU-LOGO-WHITE-BACKGROUND.png' %}">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{% static 'img/Global-wealth-university.PNG' %}">
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -21,9 +21,6 @@
               dark: '#3730a3',
               light: '#eef2ff'
             }
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
           }
         }
       }
@@ -43,12 +40,11 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: #0b0f19;
+      background: #f9fafb;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
       will-change: transform;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     .scroll-container {
@@ -63,7 +59,7 @@
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: none;
-      background: #0b0f19;
+      background: #f9fafb;
       scrollbar-width: none;
       -ms-overflow-style: none;
       -webkit-transform: translateZ(0);
@@ -91,31 +87,6 @@
       }
     }
 
-    /* ===== GRADIENT & GLOW EFFECTS ===== */
-    .bg-grid {
-      background-image: 
-        linear-gradient(rgba(79, 70, 229, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(79, 70, 229, 0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-
-    .countdown-glow {
-      text-shadow: 0 0 20px rgba(129, 140, 248, 0.5), 0 0 40px rgba(79, 70, 229, 0.3);
-    }
-
-    .card-glow {
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
-    }
-
-    .pulse-dot {
-      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
     /* ===== SCROLL BOUNDARY INDICATOR ===== */
     .scroll-boundary {
       position: fixed;
@@ -134,17 +105,11 @@
       opacity: 1;
     }
 
+    /* ===== EXISTING STYLES ===== */
     .break-words {
       word-wrap: break-word;
       overflow-wrap: break-word;
       word-break: break-word;
-    }
-
-    /* Smooth fade for the countdown numbers */
-    .countdown-digit {
-      display: inline-block;
-      min-width: 1.2ch;
-      transition: transform 0.15s ease;
     }
   </style>
 </head>
@@ -156,217 +121,213 @@
   <!-- Scroll Container (wraps everything) -->
   <div class="scroll-container" id="scrollContainer">
 
-    <!-- Minimal top bar — just brand & status -->
-    <div class="bg-gray-900/80 backdrop-blur border-b border-gray-800">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div class="flex items-center justify-between gap-4 text-xs sm:text-sm">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="w-9 h-9 bg-white rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-sm ring-2 ring-indigo-500/30">
-              <img src="{% static 'img/UOU-LOGO-WHITE-BACKGROUND.png' %}" 
-                   alt="UOU Logo" 
-                   class="w-full h-full object-contain p-0.5">
-            </div>
-            <div class="min-w-0">
-              <div class="font-bold text-white truncate">Unique Open University</div>
-              <div class="text-gray-400 text-[11px] sm:text-xs">Notice Board · Maintenance</div>
-            </div>
+    <!-- SCHOOL BANNER (above navbar) -->
+    <div class="bg-gray-900 text-gray-200 border-b border-gray-800 hidden sm:block">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        <div class="flex items-center justify-between gap-4 text-xs">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-base">🎓</span>
+            <span class="font-semibold text-white truncate">
+              Global Wealth University
+            </span>
+            <span class="text-gray-500 hidden md:inline">|</span>
+            <span class="text-gray-400 hidden md:inline truncate">
+              Department of Computer Science
+            </span>
           </div>
-          <div class="flex items-center gap-2 whitespace-nowrap">
-            <span class="pulse-dot w-2 h-2 bg-amber-400 rounded-full"></span>
-            <span class="text-amber-300 font-medium text-[11px] sm:text-xs">Upgrade in progress</span>
+          <div class="text-gray-400 whitespace-nowrap hidden md:block">
+            Official Notice Board
           </div>
         </div>
       </div>
     </div>
 
-    <!-- MAIN MAINTENANCE CONTENT -->
-    <main class="w-full min-h-[calc(100%-64px)] flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-grid relative">
-      
-      <!-- Subtle radial glow -->
-      <div class="absolute inset-0 pointer-events-none overflow-hidden">
-        <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-40 left-1/4 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-3xl"></div>
+    <!-- NAVBAR -->
+    <nav class="bg-uou text-white shadow-lg sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16 gap-3">
+
+          <!-- Brand -->
+          <a href="{% url 'dashboard' %}" class="flex items-center gap-3 min-w-0 flex-shrink">
+            <div class="w-11 h-11 bg-white rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+              <img src="{% static 'img/Global-wealth-university.PNG' %}"
+                   alt="GWU Logo"
+                   class="w-full h-full object-contain p-0.5">
+            </div>
+            <div class="min-w-0 hidden xs:block sm:block">
+              <div class="font-bold text-sm sm:text-lg leading-tight truncate">Global Wealth University</div>
+              <div class="text-xs text-indigo-200">Notice Board</div>
+            </div>
+          </a>
+
+          <!-- Desktop menu -->
+          <div class="hidden md:flex items-center gap-4 shrink-0">
+            <a href="{% url 'dashboard' %}" class="hover:text-indigo-200 text-sm whitespace-nowrap">Home</a>
+
+            {% if user.is_authenticated and user.is_staff %}
+              <a href="{% url 'admin_dashboard' %}" class="hover:text-indigo-200 text-sm whitespace-nowrap">
+                Admin Panel
+              </a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+              <span class="text-sm text-indigo-200 truncate max-w-[120px]">
+                Hi, {{ user.username }}
+              </span>
+              <form method="post" action="{% url 'account_logout' %}" class="inline">
+                {% csrf_token %}
+                <button class="bg-white text-uou px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-100 whitespace-nowrap">
+                  Logout
+                </button>
+              </form>
+            {% else %}
+              <a href="{% url 'account_login' %}"
+                 class="bg-white text-uou px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-100 whitespace-nowrap">
+                Login
+              </a>
+            {% endif %}
+          </div>
+
+          <!-- Mobile: quick action + hamburger -->
+          <div class="flex md:hidden items-center gap-2 shrink-0">
+            {% if user.is_authenticated %}
+              <form method="post" action="{% url 'account_logout' %}" class="inline">
+                {% csrf_token %}
+                <button class="bg-white text-uou px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-indigo-100 whitespace-nowrap">
+                  Logout
+                </button>
+              </form>
+            {% else %}
+              <a href="{% url 'account_login' %}"
+                 class="bg-white text-uou px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-indigo-100 whitespace-nowrap">
+                Login
+              </a>
+            {% endif %}
+
+            <button type="button" id="mobile-menu-toggle"
+                    aria-label="Open menu"
+                    class="p-1.5 rounded-lg hover:bg-uou-dark focus:outline-none">
+              <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+        </div>
       </div>
 
-      <div class="relative z-10 w-full max-w-2xl mx-auto py-12 sm:py-16 text-center">
-        
-        <!-- Icon / badge -->
-        <div class="flex justify-center mb-8">
-          <div class="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-2xl shadow-indigo-500/30 rotate-3 hover:rotate-0 transition-transform duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 sm:w-12 sm:h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
-            </svg>
-          </div>
+      <!-- Mobile dropdown -->
+      <div id="mobile-menu" class="md:hidden hidden bg-uou-dark border-t border-indigo-700">
+        <div class="px-4 py-3 space-y-1">
+
+          {% if user.is_authenticated %}
+            <div class="text-sm text-indigo-200 px-3 py-2 border-b border-indigo-700 mb-2">
+              Signed in as <strong class="text-white">{{ user.username }}</strong>
+            </div>
+          {% endif %}
+
+          <a href="{% url 'dashboard' %}"
+             class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
+            🏠 Home
+          </a>
+
+          {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'admin_dashboard' %}"
+               class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
+              ⚙️ Admin Panel
+            </a>
+            <a href="{% url 'manage_notices' %}"
+               class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
+              📋 Manage Notices
+            </a>
+            <a href="{% url 'category_list' %}"
+               class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
+              🏷️ Categories
+            </a>
+          {% endif %}
+
+          {% if user.is_authenticated %}
+            <form method="post" action="{% url 'account_logout' %}" class="pt-1">
+              {% csrf_token %}
+              <button type="submit"
+                      class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium bg-white text-uou hover:bg-indigo-100">
+                🚪 Logout
+              </button>
+            </form>
+          {% else %}
+            <a href="{% url 'account_login' %}"
+               class="block px-3 py-2.5 rounded-lg text-sm font-medium bg-white text-uou hover:bg-indigo-100">
+              🔐 Login
+            </a>
+            <a href="{% url 'account_signup' %}"
+               class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
+              ✍️ Sign Up
+            </a>
+          {% endif %}
+
         </div>
-
-        <!-- Headline -->
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
-          We're upgrading the
-          <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent">Notice Board</span>
-        </h1>
-        
-        <p class="text-base sm:text-lg text-gray-400 max-w-lg mx-auto mb-10 leading-relaxed">
-          Unique Open University's departmental notice board is getting a fresh update.
-          We'll be back shortly — thanks for your patience.
-        </p>
-
-        <!-- COUNTDOWN CARD -->
-        <div class="card-glow bg-gray-900/70 backdrop-blur-xl rounded-3xl border border-gray-800 p-6 sm:p-8 mb-10">
-          <p class="text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-6">Estimated time remaining</p>
-          
-          <div class="flex items-center justify-center gap-2 sm:gap-4" id="countdown">
-            <!-- Hours -->
-            <div class="flex flex-col items-center">
-              <div class="bg-gray-800/80 rounded-2xl w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center border border-gray-700/50">
-                <span id="hours" class="text-3xl sm:text-4xl md:text-5xl font-bold text-white countdown-glow countdown-digit">06</span>
-              </div>
-              <span class="text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest mt-3 font-medium">Hours</span>
-            </div>
-
-            <span class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-600 -mt-6">:</span>
-
-            <!-- Minutes -->
-            <div class="flex flex-col items-center">
-              <div class="bg-gray-800/80 rounded-2xl w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center border border-gray-700/50">
-                <span id="minutes" class="text-3xl sm:text-4xl md:text-5xl font-bold text-white countdown-glow countdown-digit">00</span>
-              </div>
-              <span class="text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest mt-3 font-medium">Minutes</span>
-            </div>
-
-            <span class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-600 -mt-6">:</span>
-
-            <!-- Seconds -->
-            <div class="flex flex-col items-center">
-              <div class="bg-gray-800/80 rounded-2xl w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center border border-gray-700/50">
-                <span id="seconds" class="text-3xl sm:text-4xl md:text-5xl font-bold text-white countdown-glow countdown-digit">00</span>
-              </div>
-              <span class="text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest mt-3 font-medium">Seconds</span>
-            </div>
-          </div>
-
-          <!-- Progress bar -->
-          <div class="mt-8">
-            <div class="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
-              <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full transition-all duration-1000 ease-linear" style="width: 100%"></div>
-            </div>
-            <p class="text-xs text-gray-500 mt-3">Upgrade progress</p>
-          </div>
-        </div>
-
-        <!-- Info row -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-left">
-          <div class="bg-gray-900/50 rounded-xl border border-gray-800 p-4">
-            <div class="flex items-center gap-2 mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span class="text-xs font-semibold text-gray-300">Scheduled</span>
-            </div>
-            <p class="text-[11px] text-gray-500 leading-relaxed">Automatic upgrade · No action needed</p>
-          </div>
-          <div class="bg-gray-900/50 rounded-xl border border-gray-800 p-4">
-            <div class="flex items-center gap-2 mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span class="text-xs font-semibold text-gray-300">Data safe</span>
-            </div>
-            <p class="text-[11px] text-gray-500 leading-relaxed">All notices & records are preserved</p>
-          </div>
-          <div class="bg-gray-900/50 rounded-xl border border-gray-800 p-4">
-            <div class="flex items-center gap-2 mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-              <span class="text-xs font-semibold text-gray-300">Secure</span>
-            </div>
-            <p class="text-[11px] text-gray-500 leading-relaxed">Enhanced security & performance</p>
-          </div>
-        </div>
-
-        <!-- Contact / footer note -->
-        <p class="text-xs text-gray-600 mt-10">
-          For urgent matters, please contact the CS Department office.
-        </p>
-        <p class="text-xs text-gray-700 mt-1">
-          © {% now "Y" %} Unique Open University — Departmental Notice Board
-        </p>
-
       </div>
+    </nav>
+
+    {% if messages %}
+      <div class="max-w-7xl mx-auto px-4 w-full">
+        {% for message in messages %}
+          <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-3 rounded mt-4 mb-2 break-words">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <main class="w-full overflow-x-hidden">
+      {% block content %}{% endblock %}
     </main>
+
+    <footer class="bg-gray-800 text-gray-300 py-6 mt-12">
+      <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+        © {% now "Y" %} Global Wealth University — Departmental Notice Board
+      </div>
+    </footer>
 
   </div>
   <!-- End Scroll Container -->
 
+  <script src="{% static 'js/main.js' %}"></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // ============================================================
-      // COUNTDOWN TIMER — 6 HOURS from page load
+      // MOBILE MENU TOGGLE
       // ============================================================
-      const SIX_HOURS_IN_SECONDS = 6 * 60 * 60; // 21600 seconds
-      let remainingSeconds = SIX_HOURS_IN_SECONDS;
-      const totalSeconds = SIX_HOURS_IN_SECONDS;
+      const toggle = document.getElementById('mobile-menu-toggle');
+      const menu = document.getElementById('mobile-menu');
+      const hamburger = document.getElementById('hamburger-icon');
+      const closeIcon = document.getElementById('close-icon');
 
-      const hoursEl = document.getElementById('hours');
-      const minutesEl = document.getElementById('minutes');
-      const secondsEl = document.getElementById('seconds');
-      const progressBar = document.getElementById('progressBar');
+      if (toggle && menu) {
+        toggle.addEventListener('click', () => {
+          const isOpen = !menu.classList.contains('hidden');
+          menu.classList.toggle('hidden', isOpen);
+          hamburger.classList.toggle('hidden', !isOpen);
+          closeIcon.classList.toggle('hidden', isOpen);
+        });
 
-      function pad(num) {
-        return String(num).padStart(2, '0');
+        document.addEventListener('click', (e) => {
+          if (!menu.classList.contains('hidden')
+              && !menu.contains(e.target)
+              && !toggle.contains(e.target)) {
+            menu.classList.add('hidden');
+            hamburger.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+          }
+        });
       }
 
-      function updateCountdown() {
-        if (remainingSeconds <= 0) {
-          // Timer finished — show zeros and a finished message
-          hoursEl.textContent = '00';
-          minutesEl.textContent = '00';
-          secondsEl.textContent = '00';
-          if (progressBar) progressBar.style.width = '0%';
-          // Optionally, update headline text
-          const headline = document.querySelector('h1');
-          if (headline) {
-            headline.innerHTML = 'Upgrade <span class="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">complete</span>';
-          }
-          const statusDot = document.querySelector('.pulse-dot');
-          if (statusDot) {
-            statusDot.classList.remove('bg-amber-400');
-            statusDot.classList.add('bg-emerald-400');
-          }
-          const statusText = document.querySelector('.text-amber-300');
-          if (statusText) {
-            statusText.textContent = 'Upgrade complete';
-            statusText.classList.remove('text-amber-300');
-            statusText.classList.add('text-emerald-300');
-          }
-          return;
-        }
-
-        const hrs = Math.floor(remainingSeconds / 3600);
-        const mins = Math.floor((remainingSeconds % 3600) / 60);
-        const secs = remainingSeconds % 60;
-
-        hoursEl.textContent = pad(hrs);
-        minutesEl.textContent = pad(mins);
-        secondsEl.textContent = pad(secs);
-
-        // Progress bar: starts at 100% width (6h left), decreases to 0% as time runs out
-        const progressPercent = (remainingSeconds / totalSeconds) * 100;
-        if (progressBar) progressBar.style.width = progressPercent + '%';
-
-        remainingSeconds--;
-      }
-
-      // Initial call
-      updateCountdown();
-      // Update every second
-      const interval = setInterval(updateCountdown, 1000);
-
-      // Cleanup interval if page unloads (good practice)
-      window.addEventListener('beforeunload', () => clearInterval(interval));
-
       // ============================================================
-      // iOS OVERSCROLL MANAGEMENT (same as original, but simpler)
+      // iOS OVERSCROLL MANAGEMENT
       // ============================================================
       function setupScrollManagement() {
         const scrollContainer = document.getElementById('scrollContainer');

@@ -1,14 +1,14 @@
 {% extends 'notices/base.html' %}
 {% load socialaccount %}
 
-{% block title %}Sign Up · UOU Notice Board{% endblock %}
+{% block title %}Sign Up · GWU Notice Board{% endblock %}
 
 {% block content %}
 
 <div class="max-w-md mx-auto px-4 py-12">
   <div class="bg-white rounded-xl shadow-sm border p-8">
     <h1 class="text-2xl font-bold text-gray-900 text-center mb-1">Create Account</h1>
-    <p class="text-sm text-gray-500 text-center mb-6">Join the UOU Notice Board</p>
+    <p class="text-sm text-gray-500 text-center mb-6">Join the GWU Notice Board</p>
 
     <!-- Google Signup Button -->
     <a href="{% provider_login_url 'google' %}"

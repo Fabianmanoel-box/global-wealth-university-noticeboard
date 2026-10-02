@@ -195,7 +195,7 @@ EMAIL_BACKEND = 'anymail.backends.brevo.EmailBackend'
 ANYMAIL = {
     'BREVO_API_KEY': config('BREVO_API_KEY', default=''),
 }
-DEFAULT_FROM_EMAIL = 'UOU Notice Board <samuelemenike4321@gmail.com>'
+DEFAULT_FROM_EMAIL = 'Global Wealth University <samuelemenike4321@gmail.com>'
 
 # ============================================
 # DJANGO-ALLAUTH CONFIGURATION (64.x style)
