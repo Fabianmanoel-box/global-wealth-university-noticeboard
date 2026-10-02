@@ -28,7 +28,7 @@
   </script>
 
   <style>
-    /* ===== ANTI-OVERSCROLL (iOS FIX) ===== */
+    /* ===== ANTI-OVERSCROLL (iOS FIX) — FIXED FOOTER LAYOUT ===== */
     html, body {
       width: 100%;
       height: 100%;
@@ -47,14 +47,14 @@
       will-change: transform;
     }
 
+    /* Scroll container now leaves room for the fixed footer */
     .scroll-container {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      bottom: 0;
+      bottom: 53px; /* height of the footer */
       width: 100%;
-      height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
@@ -78,19 +78,29 @@
       .scroll-container {
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: none;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
       }
+    }
+
+    /* Fixed footer at the bottom of the viewport */
+    .fixed-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 53px;
+      z-index: 40;
+      background: #1f2937;
+      color: #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-top: 1px solid #374151;
     }
 
     /* ===== SCROLL BOUNDARY INDICATOR ===== */
     .scroll-boundary {
       position: fixed;
-      bottom: 0;
+      bottom: 53px; /* sits just above the footer */
       left: 0;
       width: 100%;
       height: 3px;
@@ -111,6 +121,19 @@
       overflow-wrap: break-word;
       word-break: break-word;
     }
+
+    /* Small phones — tighter footer */
+    @media (max-width: 380px) {
+      .scroll-container {
+        bottom: 45px;
+      }
+      .fixed-footer {
+        height: 45px;
+      }
+      .scroll-boundary {
+        bottom: 45px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -118,7 +141,7 @@
   <!-- Scroll Boundary Indicator -->
   <div id="scrollBoundary" class="scroll-boundary"></div>
 
-  <!-- Scroll Container (wraps everything) -->
+  <!-- Scroll Container (everything EXCEPT the footer) -->
   <div class="scroll-container" id="scrollContainer">
 
     <!-- SCHOOL BANNER (above navbar) -->
@@ -286,14 +309,15 @@
       {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-gray-800 text-gray-300 py-6 mt-12">
-      <div class="max-w-7xl mx-auto px-4 text-center text-sm">
-        © {% now "Y" %} Global Wealth University — Departmental Notice Board
-      </div>
-    </footer>
-
   </div>
   <!-- End Scroll Container -->
+
+  <!-- ===== FIXED FOOTER (always visible at the bottom) ===== -->
+  <footer class="fixed-footer">
+    <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+      © {% now "Y" %} Global Wealth University — Departmental Notice Board
+    </div>
+  </footer>
 
   <script src="{% static 'js/main.js' %}"></script>
 
@@ -368,7 +392,7 @@
           }, { passive: false });
         }
 
-        // Scroll boundary indicator
+        // Scroll boundary indicator — shown when near the bottom of scrollable content
         scrollContainer.addEventListener('scroll', function() {
           const distanceFromBottom = this.scrollHeight - (this.scrollTop + this.clientHeight);
           const boundary = document.getElementById('scrollBoundary');
