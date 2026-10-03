@@ -39,11 +39,12 @@ def dashboard(request):
             if q_lower in n.title.lower() or q_lower in n.content.lower()
         ]
 
-    # ✅ Show ALL notices in the main grid
-    latest_notices = notices
-
-    # ✅ Pinned section — up to 6 (adjust to taste)
+    # Pinned notices — up to 6, shown in "Important Announcements"
     important_notices = [n for n in notices if n.is_important][:6]
+
+    # Latest grid — exclude pinned ones so no duplication
+    important_ids = {n.pk for n in important_notices}
+    latest_notices = [n for n in notices if n.pk not in important_ids]
 
     categories = Category.objects.all()
 
@@ -98,7 +99,7 @@ def api_search_notices(request):
         ]
 
     data = []
-    # ✅ Return ALL notices (no slicing)
+    # Return ALL notices (no slicing) — includes pinned during search
     for n in notices:
         data.append({
             'id': n.pk,
