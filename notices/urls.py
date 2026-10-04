@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     # ---------- STUDENT ----------
     path('', views.dashboard, name='dashboard'),
+    path('pinned/', views.pinned_notices, name='pinned_notices'),
     path('notice/<int:pk>/', views.notice_detail, name='notice_detail'),
 
     # ---------- API ----------

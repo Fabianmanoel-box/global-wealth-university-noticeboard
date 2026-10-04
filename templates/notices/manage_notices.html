@@ -24,6 +24,11 @@
                 {% if status_filter == 'published' %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 hover:border-uou{% endif %}">
         Published
       </a>
+      <a href="?status=scheduled"
+         class="px-3 py-1.5 rounded-lg text-sm font-semibold border
+                {% if status_filter == 'scheduled' %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 hover:border-uou{% endif %}">
+        Scheduled
+      </a>
       <a href="?status=draft"
          class="px-3 py-1.5 rounded-lg text-sm font-semibold border
                 {% if status_filter == 'draft' %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 hover:border-uou{% endif %}">
@@ -85,6 +90,11 @@
                 {% if n.is_expired %}
                   <span class="px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 whitespace-nowrap">
                     Expired
+                  </span>
+                {% elif n.is_scheduled %}
+                  <span class="px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 whitespace-nowrap"
+                        title="Scheduled for {{ n.scheduled_at|date:'M d, Y H:i' }}">
+                    ⏰ Scheduled
                   </span>
                 {% elif n.status == 'published' %}
                   <span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 whitespace-nowrap">

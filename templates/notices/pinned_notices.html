@@ -1,0 +1,77 @@
+{% extends 'notices/base.html' %}
+
+{% block title %}Pinned Notices · GWU Notice Board{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<div class="bg-gradient-to-r from-red-600 to-red-700 text-white">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+
+    <a href="{% url 'dashboard' %}"
+       class="inline-flex items-center gap-1 text-red-100 hover:text-white text-sm font-medium mb-4">
+      ← Back to all notices
+    </a>
+
+    <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-4">
+      <span class="text-sm">⚠️</span>
+      <span class="text-xs sm:text-sm font-semibold text-white tracking-wide">
+        Important Announcements
+      </span>
+    </div>
+
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold break-words">
+      All Pinned Notices
+    </h1>
+    <p class="text-red-100 mt-1">
+      {{ total_count }} pinned notice{{ total_count|pluralize }} requiring your attention
+    </p>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+  {% if notices %}
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {% for n in notices %}
+        <a href="{% url 'notice_detail' n.pk %}"
+           class="block bg-red-50 border-l-4 border-red-500 rounded-lg p-5 hover:shadow-lg transition overflow-hidden min-w-0">
+
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="text-xs font-semibold text-red-600 uppercase">Pinned</div>
+            {% if n.category %}
+              <span class="px-2 py-0.5 rounded-full text-xs font-semibold
+                           bg-{{ n.category.color }}-100 text-{{ n.category.color }}-700">
+                {{ n.category.name }}
+              </span>
+            {% endif %}
+          </div>
+
+          <h3 class="font-bold text-gray-900 text-lg break-words">{{ n.title }}</h3>
+          <p class="text-sm text-gray-600 mt-2 break-words overflow-hidden">
+            {{ n.content|truncatewords:25 }}
+          </p>
+
+          <div class="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t gap-2 flex-wrap">
+            <span class="truncate max-w-[50%]">{{ n.author.username }}</span>
+            <span class="whitespace-nowrap">{{ n.published_at|date:"M d, Y" }}</span>
+          </div>
+
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bg-white rounded-xl p-12 text-center border border-dashed">
+      <div class="text-4xl mb-3">📌</div>
+      <p class="text-gray-600 font-semibold">No pinned notices right now.</p>
+      <p class="text-sm text-gray-500 mt-1">Check back later for important announcements.</p>
+      <a href="{% url 'dashboard' %}"
+         class="inline-block mt-4 bg-uou text-white px-4 py-2 rounded-lg font-semibold hover:bg-uou-dark">
+        Back to Dashboard
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

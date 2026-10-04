@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================
-  // LIVE SEARCH on dashboard
+  // LIVE SEARCH + PAGINATION on dashboard
   // ============================================
   const searchInput = document.querySelector('#live-search-input');
   const clearBtn = document.querySelector('#clear-search');
@@ -54,12 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const noticesHeading = document.querySelector('#notices-heading');
   const importantSection = document.querySelector('#important-section');
   const categoryPills = document.querySelectorAll('.category-pill');
+  const paginationControls = document.querySelector('#pagination-controls');
 
   let currentCategory = '';
+  let currentPage = 1;
   let searchTimeout = null;
 
   const urlParams = new URLSearchParams(window.location.search);
   currentCategory = urlParams.get('category') || '';
+  currentPage = parseInt(urlParams.get('page') || '1', 10);
 
   function escapeHtml(str) {
     if (!str) return '';
@@ -87,6 +90,78 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   }
 
+  function renderPagination(data) {
+    if (!paginationControls) return;
+    if (data.total_pages <= 1) {
+      paginationControls.innerHTML = '';
+      return;
+    }
+
+    let html = '<nav class="flex items-center justify-center gap-1 flex-wrap" aria-label="Pagination">';
+
+    // Previous button
+    if (data.has_previous) {
+      html += `<a href="#" data-page="${data.previous_page}"
+                 class="pagination-btn px-3 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">← Prev</a>`;
+    } else {
+      html += `<span class="px-3 py-2 rounded-lg border text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">← Prev</span>`;
+    }
+
+    const current = data.page;
+    const total = data.total_pages;
+
+    // First page (if we're far from start)
+    if (current > 3) {
+      html += `<a href="#" data-page="1"
+                 class="pagination-btn px-4 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">1</a>`;
+      if (current > 4) {
+        html += `<span class="px-2 py-2 text-sm text-gray-400">…</span>`;
+      }
+    }
+
+    // 3-number window around current page
+    for (let i = current - 1; i <= current + 1; i++) {
+      if (i >= 1 && i <= total) {
+        if (i === current) {
+          html += `<span class="px-4 py-2 rounded-lg text-sm font-bold bg-uou text-white border border-uou">${i}</span>`;
+        } else {
+          html += `<a href="#" data-page="${i}"
+                     class="pagination-btn px-4 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">${i}</a>`;
+        }
+      }
+    }
+
+    // Last page (if we're far from end)
+    if (current < total - 2) {
+      if (current < total - 3) {
+        html += `<span class="px-2 py-2 text-sm text-gray-400">…</span>`;
+      }
+      html += `<a href="#" data-page="${total}"
+                 class="pagination-btn px-4 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">${total}</a>`;
+    }
+
+    // Next button
+    if (data.has_next) {
+      html += `<a href="#" data-page="${data.next_page}"
+                 class="pagination-btn px-3 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">Next →</a>`;
+    } else {
+      html += `<span class="px-3 py-2 rounded-lg border text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">Next →</span>`;
+    }
+
+    html += '</nav>';
+    paginationControls.innerHTML = html;
+
+    // Wire up pagination clicks
+    paginationControls.querySelectorAll('.pagination-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentPage = parseInt(btn.dataset.page, 10);
+        fetchNotices();
+        noticesHeading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
+
   function renderNotices(notices, count) {
     if (!notices || notices.length === 0) {
       noticesGrid.innerHTML = '';
@@ -100,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
       noticesCount.textContent = `${count} notice${count === 1 ? '' : 's'}`;
     }
 
-    if (searchInput.value.trim() || currentCategory) {
+    if ((searchInput && searchInput.value.trim()) || currentCategory) {
       noticesHeading.textContent = 'Search Results';
       if (importantSection) importantSection.classList.add('hidden');
     } else {
@@ -108,15 +183,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (importantSection) importantSection.classList.remove('hidden');
     }
 
-    if (searchInput.value.trim()) {
+    if (searchInput && searchInput.value.trim()) {
       clearBtn.classList.remove('hidden');
-    } else {
+    } else if (clearBtn) {
       clearBtn.classList.add('hidden');
     }
   }
 
   async function fetchNotices() {
-    const q = searchInput.value.trim();
+    const q = searchInput ? searchInput.value.trim() : '';
 
     if (!q && !currentCategory) {
       window.location.href = window.location.pathname;
@@ -129,12 +204,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams();
       if (q) params.append('q', q);
       if (currentCategory) params.append('category', currentCategory);
+      params.append('page', currentPage);
 
       const response = await fetch(`/api/notices/search/?${params.toString()}`);
       if (!response.ok) throw new Error('Network error');
 
       const data = await response.json();
       renderNotices(data.notices, data.count);
+      renderPagination(data);
     } catch (err) {
       console.error('Search failed:', err);
     } finally {
@@ -144,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (searchInput) {
     searchInput.addEventListener('input', () => {
+      currentPage = 1;
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(fetchNotices, 250);
     });
@@ -151,11 +229,13 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
+        currentPage = 1;
         clearTimeout(searchTimeout);
         fetchNotices();
       }
       if (e.key === 'Escape') {
         searchInput.value = '';
+        currentPage = 1;
         fetchNotices();
       }
     });
@@ -164,6 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
       searchInput.value = '';
+      currentPage = 1;
       clearTimeout(searchTimeout);
       fetchNotices();
       searchInput.focus();
@@ -172,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (searchBtn) {
     searchBtn.addEventListener('click', () => {
+      currentPage = 1;
       clearTimeout(searchTimeout);
       fetchNotices();
     });
@@ -181,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     pill.addEventListener('click', (e) => {
       e.preventDefault();
       currentCategory = pill.dataset.category || '';
+      currentPage = 1;
 
       categoryPills.forEach(p => {
         p.classList.remove('bg-uou', 'text-white', 'border-uou');
@@ -207,7 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
       el.style.opacity = '0';
       setTimeout(() => {
         el.remove();
-
         const parent = el.parentElement;
         if (parent && parent.tagName === 'DIV' && parent.children.length === 0) {
           parent.remove();

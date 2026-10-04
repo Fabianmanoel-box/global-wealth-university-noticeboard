@@ -40,6 +40,7 @@ class Notice(models.Model):
     STATUS_CHOICES = [
         ('draft', 'Draft'),
         ('published', 'Published'),
+        ('scheduled', 'Scheduled'),
     ]
 
     title = models.CharField(max_length=200)
@@ -55,6 +56,10 @@ class Notice(models.Model):
     is_important = models.BooleanField(default=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='published')
     published_at = models.DateTimeField(default=timezone.now)
+    scheduled_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text='If set in future, notice stays hidden until this date/time.'
+    )
     expiry_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -75,5 +80,31 @@ class Notice(models.Model):
         return False
 
     @property
+    def is_scheduled(self):
+        if self.scheduled_at and timezone.now() < self.scheduled_at:
+            return True
+        return False
+
+    @property
     def is_active(self):
-        return self.status == 'published' and not self.is_expired
+        return self.status == 'published' and not self.is_expired and not self.is_scheduled
+
+    def save(self, *args, **kwargs):
+        # Auto-flip status based on scheduled_at
+        if self.scheduled_at and self.scheduled_at > timezone.now():
+            self.status = 'scheduled'
+        elif self.status == 'scheduled' and (
+            not self.scheduled_at or self.scheduled_at <= timezone.now()
+        ):
+            self.status = 'published'
+        super().save(*args, **kwargs)
+
+    def auto_publish_if_due(self):
+        """If scheduled time has passed, flip to published."""
+        if (
+            self.status == 'scheduled'
+            and self.scheduled_at
+            and self.scheduled_at <= timezone.now()
+        ):
+            self.status = 'published'
+            self.save(update_fields=['status'])
