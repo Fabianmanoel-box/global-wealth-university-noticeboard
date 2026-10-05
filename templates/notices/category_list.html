@@ -6,23 +6,63 @@
 
 <div class="max-w-5xl mx-auto px-4 py-8">
 
+  <!-- Header -->
   <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
-      <p class="text-sm text-gray-500 mt-1">Organize your notices by topic</p>
+      <p class="text-sm text-gray-500 mt-1">{{ total_count }} categor{{ total_count|pluralize:"y,ies" }} total</p>
     </div>
-
     <a href="{% url 'category_create' %}"
-       class="bg-uou text-white px-4 py-2 rounded-lg font-semibold hover:bg-uou-dark">
+       class="bg-uou text-white px-4 py-2 rounded-lg font-semibold hover:bg-uou-dark whitespace-nowrap">
       + Add Category
     </a>
   </div>
 
-  <div class="grid sm:grid-cols-2 gap-4">
-    {% for c in categories %}
-      <div class="bg-white rounded-xl shadow-sm border p-5 flex items-start justify-between gap-3">
+  <!-- Search -->
+  <form method="get" class="bg-white rounded-xl shadow-sm border p-4 mb-6">
+    <div class="flex gap-2">
+      <div class="relative flex-1 min-w-0">
+        <input type="text"
+               name="q"
+               value="{{ query }}"
+               placeholder="Search categories by name or description..."
+               autocomplete="off"
+               class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-uou focus:border-transparent">
 
-        <div class="min-w-0 flex-1">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+
+        {% if query %}
+          <a href="{% url 'category_list' %}"
+             class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 text-lg">
+            ✕
+          </a>
+        {% endif %}
+      </div>
+      <button type="submit"
+              class="bg-uou text-white px-6 py-2 rounded-lg font-semibold hover:bg-uou-dark whitespace-nowrap">
+        Search
+      </button>
+    </div>
+
+    {% if query %}
+      <div class="flex items-center gap-2 mt-3 pt-3 border-t text-xs">
+        <span class="text-gray-500">Searching:</span>
+        <span class="px-2 py-1 rounded-full bg-uou-light text-uou font-semibold">
+          🔍 "{{ query }}"
+        </span>
+        <a href="{% url 'category_list' %}" class="text-red-600 hover:underline font-semibold ml-2">
+          Clear
+        </a>
+      </div>
+    {% endif %}
+  </form>
+
+  <!-- Category grid -->
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for c in categories %}
+      <div class="bg-white rounded-xl shadow-sm border p-5 flex flex-col justify-between gap-3">
+
+        <div class="min-w-0">
           <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold
                        bg-{{ c.color }}-100 text-{{ c.color }}-700">
             {{ c.name }}
@@ -41,32 +81,88 @@
           </div>
         </div>
 
-        <div class="flex flex-col gap-2 text-right shrink-0">
+        <div class="flex gap-2 pt-3 border-t">
           <a href="{% url 'category_edit' c.pk %}"
-             class="text-uou text-xs font-semibold hover:underline">
-            Edit
+             class="flex-1 text-center text-uou text-xs font-semibold hover:underline py-2 rounded-lg hover:bg-uou-light">
+            ✏️ Edit
           </a>
           <a href="{% url 'category_delete' c.pk %}"
-             class="text-red-600 text-xs font-semibold hover:underline">
-            Delete
+             class="flex-1 text-center text-red-600 text-xs font-semibold hover:underline py-2 rounded-lg hover:bg-red-50">
+            🗑️ Delete
           </a>
         </div>
 
       </div>
     {% empty %}
-      <div class="sm:col-span-2 bg-white rounded-xl p-12 text-center border border-dashed">
+      <div class="sm:col-span-2 lg:col-span-3 bg-white rounded-xl p-12 text-center border border-dashed">
         <div class="text-4xl mb-3">🏷️</div>
-        <p class="text-gray-600 font-semibold">No categories yet.</p>
-        <p class="text-sm text-gray-500 mt-1">
-          Create your first category to start organizing notices.
-        </p>
-        <a href="{% url 'category_create' %}"
-           class="inline-block mt-4 bg-uou text-white px-4 py-2 rounded-lg font-semibold hover:bg-uou-dark">
-          + Add Category
-        </a>
+        {% if query %}
+          <p class="text-gray-600 font-semibold">No categories match "{{ query }}".</p>
+          <p class="text-sm text-gray-500 mt-1">Try a different search term.</p>
+          <a href="{% url 'category_list' %}"
+             class="inline-block mt-4 bg-uou text-white px-4 py-2 rounded-lg font-semibold hover:bg-uou-dark">
+            Clear search
+          </a>
+        {% else %}
+          <p class="text-gray-600 font-semibold">No categories yet.</p>
+          <p class="text-sm text-gray-500 mt-1">
+            Create your first category to start organizing notices.
+          </p>
+          <a href="{% url 'category_create' %}"
+             class="inline-block mt-4 bg-uou text-white px-4 py-2 rounded-lg font-semibold hover:bg-uou-dark">
+            + Add Category
+          </a>
+        {% endif %}
       </div>
     {% endfor %}
   </div>
+
+  <!-- Pagination (pure 3 numbers) -->
+  {% if page_obj.has_other_pages %}
+    <div class="mt-6 flex items-center justify-center">
+      <nav class="flex items-center gap-1 flex-wrap" aria-label="Pagination">
+
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}"
+             class="px-3 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">
+            ← Prev
+          </a>
+        {% else %}
+          <span class="px-3 py-2 rounded-lg border text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
+            ← Prev
+          </span>
+        {% endif %}
+
+        {% with current=page_obj.number total=page_obj.paginator.num_pages %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if num >= current|add:'-1' and num <= current|add:'1' %}
+              {% if num == current %}
+                <span class="px-4 py-2 rounded-lg text-sm font-bold bg-uou text-white border border-uou">
+                  {{ num }}
+                </span>
+              {% else %}
+                <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}"
+                   class="px-4 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">
+                  {{ num }}
+                </a>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endwith %}
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}"
+             class="px-3 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">
+            Next →
+          </a>
+        {% else %}
+          <span class="px-3 py-2 rounded-lg border text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
+            Next →
+          </span>
+        {% endif %}
+      </nav>
+    </div>
+  {% endif %}
 
 </div>
 

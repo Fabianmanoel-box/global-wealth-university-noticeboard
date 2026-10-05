@@ -5,12 +5,15 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.utils.text import slugify
+from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Notice, Category
 from .forms import NoticeForm, CategoryForm
 
 
 NOTICES_PER_PAGE = 9
+ADMIN_NOTICES_PER_PAGE = 10
+ADMIN_CATEGORIES_PER_PAGE = 9
 
 
 def is_admin(user):
@@ -216,13 +219,43 @@ def admin_dashboard(request):
 @user_passes_test(is_admin)
 def manage_notices(request):
     _auto_publish_due_notices()
+
     notices = Notice.objects.all()
+
     status_filter = request.GET.get('status', '')
     if status_filter:
         notices = notices.filter(status=status_filter)
+
+    category_slug = request.GET.get('category', '')
+    if category_slug:
+        notices = notices.filter(category__slug=category_slug)
+
+    query = request.GET.get('q', '').strip()
+    if query:
+        notices = notices.filter(
+            Q(title__icontains=query) | Q(content__icontains=query)
+        )
+
+    paginator = Paginator(notices, ADMIN_NOTICES_PER_PAGE)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    categories = Category.objects.all()
+
     return render(request, 'notices/manage_notices.html', {
-        'notices': notices,
+        'notices': page_obj,
+        'page_obj': page_obj,
+        'paginator': paginator,
         'status_filter': status_filter,
+        'category_filter': category_slug,
+        'query': query,
+        'categories': categories,
+        'total_count': paginator.count,
     })
 
 
@@ -294,8 +327,30 @@ def notice_toggle_publish(request, pk):
 @login_required
 @user_passes_test(is_admin)
 def category_list(request):
-    categories = Category.objects.all()
-    return render(request, 'notices/category_list.html', {'categories': categories})
+    categories = Category.objects.all().order_by('name')
+
+    query = request.GET.get('q', '').strip()
+    if query:
+        categories = categories.filter(
+            Q(name__icontains=query) | Q(description__icontains=query)
+        )
+
+    paginator = Paginator(categories, ADMIN_CATEGORIES_PER_PAGE)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    return render(request, 'notices/category_list.html', {
+        'categories': page_obj,
+        'page_obj': page_obj,
+        'paginator': paginator,
+        'query': query,
+        'total_count': paginator.count,
+    })
 
 
 @login_required

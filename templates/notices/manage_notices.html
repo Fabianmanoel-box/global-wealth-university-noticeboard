@@ -6,40 +6,126 @@
 
 <div class="max-w-7xl mx-auto px-4 py-8">
 
-  <!-- Header + filters -->
+  <!-- Header -->
   <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Manage Notices</h1>
-      <p class="text-sm text-gray-500 mt-1">Create, edit, publish, or delete notices</p>
+      <p class="text-sm text-gray-500 mt-1">{{ total_count }} notice{{ total_count|pluralize }} total</p>
+    </div>
+    <a href="{% url 'notice_create' %}"
+       class="bg-uou text-white px-4 py-2 rounded-lg font-semibold hover:bg-uou-dark whitespace-nowrap">
+      + New Notice
+    </a>
+  </div>
+
+  <!-- Search + Filters -->
+  <div class="bg-white rounded-xl shadow-sm border p-4 mb-6 space-y-4">
+
+    <form method="get" class="flex gap-2">
+      <div class="relative flex-1 min-w-0">
+        <input type="text"
+               name="q"
+               value="{{ query }}"
+               placeholder="Search notices by title or content..."
+               autocomplete="off"
+               class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-uou focus:border-transparent">
+
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+
+        {% if query %}
+          <a href="?{% if status_filter %}status={{ status_filter }}&{% endif %}{% if category_filter %}category={{ category_filter }}{% endif %}"
+             class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 text-lg">
+            ✕
+          </a>
+        {% endif %}
+      </div>
+
+      {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+      {% if category_filter %}<input type="hidden" name="category" value="{{ category_filter }}">{% endif %}
+
+      <button type="submit"
+              class="bg-uou text-white px-6 py-2 rounded-lg font-semibold hover:bg-uou-dark whitespace-nowrap">
+        Search
+      </button>
+    </form>
+
+    <div class="flex flex-wrap items-center gap-3">
+
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-gray-500 uppercase">Status:</span>
+        <div class="flex flex-wrap gap-1">
+          <a href="?{% if query %}q={{ query }}&{% endif %}{% if category_filter %}category={{ category_filter }}{% endif %}"
+             class="px-3 py-1 rounded-lg text-xs font-semibold border
+                    {% if not status_filter %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 border-gray-300 hover:border-uou{% endif %}">
+            All
+          </a>
+          <a href="?status=published{% if query %}&q={{ query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}"
+             class="px-3 py-1 rounded-lg text-xs font-semibold border
+                    {% if status_filter == 'published' %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 border-gray-300 hover:border-uou{% endif %}">
+            Published
+          </a>
+          <a href="?status=scheduled{% if query %}&q={{ query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}"
+             class="px-3 py-1 rounded-lg text-xs font-semibold border
+                    {% if status_filter == 'scheduled' %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 border-gray-300 hover:border-uou{% endif %}">
+            ⏰ Scheduled
+          </a>
+          <a href="?status=draft{% if query %}&q={{ query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}"
+             class="px-3 py-1 rounded-lg text-xs font-semibold border
+                    {% if status_filter == 'draft' %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 border-gray-300 hover:border-uou{% endif %}">
+            Draft
+          </a>
+        </div>
+      </div>
+
+      {% if categories %}
+        <div class="hidden sm:block text-gray-300">|</div>
+      {% endif %}
+
+      {% if categories %}
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-gray-500 uppercase">Category:</span>
+          <select onchange="window.location.href=this.value"
+                  class="px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-semibold focus:ring-2 focus:ring-uou focus:border-transparent bg-white">
+            <option value="?{% if query %}q={{ query }}&{% endif %}{% if status_filter %}status={{ status_filter }}{% endif %}"
+                    {% if not category_filter %}selected{% endif %}>
+              All Categories
+            </option>
+            {% for cat in categories %}
+              <option value="?category={{ cat.slug }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                      {% if category_filter == cat.slug %}selected{% endif %}>
+                {{ cat.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+
     </div>
 
-    <div class="flex flex-wrap items-center gap-2">
-      <a href="?status="
-         class="px-3 py-1.5 rounded-lg text-sm font-semibold border
-                {% if not status_filter %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 hover:border-uou{% endif %}">
-        All
-      </a>
-      <a href="?status=published"
-         class="px-3 py-1.5 rounded-lg text-sm font-semibold border
-                {% if status_filter == 'published' %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 hover:border-uou{% endif %}">
-        Published
-      </a>
-      <a href="?status=scheduled"
-         class="px-3 py-1.5 rounded-lg text-sm font-semibold border
-                {% if status_filter == 'scheduled' %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 hover:border-uou{% endif %}">
-        Scheduled
-      </a>
-      <a href="?status=draft"
-         class="px-3 py-1.5 rounded-lg text-sm font-semibold border
-                {% if status_filter == 'draft' %}bg-uou text-white border-uou{% else %}bg-white text-gray-700 hover:border-uou{% endif %}">
-        Draft
-      </a>
+    {% if query or status_filter or category_filter %}
+      <div class="flex flex-wrap items-center gap-2 pt-3 border-t text-xs">
+        <span class="text-gray-500">Active filters:</span>
+        {% if query %}
+          <span class="px-2 py-1 rounded-full bg-uou-light text-uou font-semibold">
+            🔍 "{{ query }}"
+          </span>
+        {% endif %}
+        {% if status_filter %}
+          <span class="px-2 py-1 rounded-full bg-uou-light text-uou font-semibold">
+            Status: {{ status_filter|title }}
+          </span>
+        {% endif %}
+        {% if category_filter %}
+          <span class="px-2 py-1 rounded-full bg-uou-light text-uou font-semibold">
+            Category: {{ category_filter }}
+          </span>
+        {% endif %}
+        <a href="{% url 'manage_notices' %}" class="text-red-600 hover:underline font-semibold ml-2">
+          Clear all
+        </a>
+      </div>
+    {% endif %}
 
-      <a href="{% url 'notice_create' %}"
-         class="bg-uou text-white px-4 py-1.5 rounded-lg font-semibold hover:bg-uou-dark whitespace-nowrap">
-        + New Notice
-      </a>
-    </div>
   </div>
 
   <!-- Table -->
@@ -125,10 +211,17 @@
           {% empty %}
             <tr>
               <td colspan="5" class="p-12 text-center text-gray-500">
-                No notices found.
-                <a href="{% url 'notice_create' %}" class="text-uou font-semibold hover:underline ml-1">
-                  Create one →
-                </a>
+                {% if query or status_filter or category_filter %}
+                  No notices match your filters.
+                  <a href="{% url 'manage_notices' %}" class="text-uou font-semibold hover:underline ml-1">
+                    Clear filters
+                  </a>
+                {% else %}
+                  No notices found.
+                  <a href="{% url 'notice_create' %}" class="text-uou font-semibold hover:underline ml-1">
+                    Create one →
+                  </a>
+                {% endif %}
               </td>
             </tr>
           {% endfor %}
@@ -136,6 +229,53 @@
       </table>
     </div>
   </div>
+
+  <!-- Pagination (pure 3 numbers) -->
+  {% if page_obj.has_other_pages %}
+    <div class="mt-6 flex items-center justify-center">
+      <nav class="flex items-center gap-1 flex-wrap" aria-label="Pagination">
+
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}"
+             class="px-3 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">
+            ← Prev
+          </a>
+        {% else %}
+          <span class="px-3 py-2 rounded-lg border text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
+            ← Prev
+          </span>
+        {% endif %}
+
+        {% with current=page_obj.number total=page_obj.paginator.num_pages %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if num >= current|add:'-1' and num <= current|add:'1' %}
+              {% if num == current %}
+                <span class="px-4 py-2 rounded-lg text-sm font-bold bg-uou text-white border border-uou">
+                  {{ num }}
+                </span>
+              {% else %}
+                <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}"
+                   class="px-4 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">
+                  {{ num }}
+                </a>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endwith %}
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}"
+             class="px-3 py-2 rounded-lg border text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50">
+            Next →
+          </a>
+        {% else %}
+          <span class="px-3 py-2 rounded-lg border text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
+            Next →
+          </span>
+        {% endif %}
+      </nav>
+    </div>
+  {% endif %}
 
 </div>
 
