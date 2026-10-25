@@ -1,13 +1,9 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>{% block title %}GWU Notice Board{% endblock %}</title>
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="{% static 'img/Global-wealth-university.PNG' %}">
+  <title>Global Wealth University · Notice Board Upgrade</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -16,16 +12,26 @@
       theme: {
         extend: {
           colors: {
-            uou: {
-              DEFAULT: '#4f46e5',
-              dark: '#3730a3',
-              light: '#eef2ff'
+            gw: {
+              DEFAULT: '#0f766e',
+              dark: '#115e59',
+              light: '#ccfbf1',
+              gold: '#f59e0b',
+              deep: '#042f2e'
             }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            display: ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
           }
         }
       }
     }
   </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     /* ===== ANTI-OVERSCROLL (iOS FIX) ===== */
@@ -40,11 +46,12 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: #f9fafb;
+      background: #042f2e;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
       will-change: transform;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     .scroll-container {
@@ -59,7 +66,7 @@
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: none;
-      background: #f9fafb;
+      background: #042f2e;
       scrollbar-width: none;
       -ms-overflow-style: none;
       -webkit-transform: translateZ(0);
@@ -87,29 +94,133 @@
       }
     }
 
-    /* ===== STICKY FOOTER LAYOUT =====
-       The inner wrapper fills at least the full height of the scroll area.
-       The main element grows to push the footer to the bottom when content is short.
-       When content is long, the wrapper grows taller than the viewport and the footer scrolls naturally. */
-    .page-wrapper {
-      display: flex;
-      flex-direction: column;
-      min-height: 100%;
+    /* ===== AMBIENT BACKDROP ===== */
+    .ambient-bg {
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(20, 184, 166, 0.25), transparent),
+        radial-gradient(ellipse 60% 50% at 80% 100%, rgba(245, 158, 11, 0.12), transparent),
+        radial-gradient(ellipse 60% 50% at 20% 100%, rgba(15, 118, 110, 0.25), transparent),
+        #042f2e;
     }
 
-    .page-main {
-      flex: 1 0 auto;
+    .grid-overlay {
+      background-image:
+        linear-gradient(rgba(20, 184, 166, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 184, 166, 0.06) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%);
+    }
+
+    /* ===== GLOW & SHIMMER ===== */
+    .teal-glow {
+      text-shadow:
+        0 0 24px rgba(20, 184, 166, 0.55),
+        0 0 60px rgba(20, 184, 166, 0.35),
+        0 0 100px rgba(15, 118, 110, 0.25);
+    }
+
+    .gold-glow {
+      text-shadow:
+        0 0 20px rgba(245, 158, 11, 0.6),
+        0 0 50px rgba(245, 158, 11, 0.35);
+    }
+
+    .card-glow {
+      box-shadow:
+        0 0 0 1px rgba(20, 184, 166, 0.15),
+        0 30px 60px -20px rgba(0, 0, 0, 0.7),
+        0 0 80px -20px rgba(20, 184, 166, 0.25);
+    }
+
+    .ring-glow {
+      box-shadow: 0 0 0 1px rgba(20, 184, 166, 0.4), 0 0 40px -5px rgba(20, 184, 166, 0.5);
+    }
+
+    /* ===== ANIMATIONS ===== */
+    .pulse-dot {
+      animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.85); }
+    }
+
+    .spin-slow {
+      animation: spin 14s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .float-soft {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .shimmer {
+      background: linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%);
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .scan-line::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
       width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.15), transparent);
+      animation: scan 3.5s ease-in-out infinite;
     }
 
-    /* ===== SCROLL BOUNDARY INDICATOR ===== */
+    @keyframes scan {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .digit-flip {
+      animation: digitFlip 0.5s ease;
+      display: inline-block;
+    }
+
+    @keyframes digitFlip {
+      0% { transform: rotateX(0deg); opacity: 1; }
+      50% { transform: rotateX(90deg); opacity: 0.3; }
+      100% { transform: rotateX(0deg); opacity: 1; }
+    }
+
+    /* Day counter special pulse */
+    .day-pulse {
+      animation: dayPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes dayPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+    }
+
+    /* ===== SCROLL BOUNDARY ===== */
     .scroll-boundary {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
       height: 3px;
-      background: linear-gradient(90deg, #4f46e5, #818cf8, #a78bfa);
+      background: linear-gradient(90deg, #0f766e, #14b8a6, #f59e0b);
       z-index: 9999;
       pointer-events: none;
       opacity: 0;
@@ -120,234 +231,321 @@
       opacity: 1;
     }
 
-    /* ===== EXISTING STYLES ===== */
     .break-words {
       word-wrap: break-word;
       overflow-wrap: break-word;
       word-break: break-word;
     }
+
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .teal-gradient-text {
+      background: linear-gradient(135deg, #5eead4 0%, #14b8a6 50%, #0f766e 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .corner-accent {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-color: rgba(20, 184, 166, 0.4);
+    }
   </style>
 </head>
 <body>
 
-  <!-- Scroll Boundary Indicator -->
   <div id="scrollBoundary" class="scroll-boundary"></div>
 
-  <!-- Scroll Container -->
   <div class="scroll-container" id="scrollContainer">
 
-    <!-- Page Wrapper (flex column, min-height 100%) -->
-    <div class="page-wrapper">
+    <!-- TOP STATUS BAR -->
+    <div class="relative z-20 border-b border-teal-500/10 bg-teal-950/40 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div class="flex items-center justify-between gap-4">
 
-      <!-- SCHOOL BANNER -->
-      <div class="bg-gray-900 text-gray-200 border-b border-gray-800 hidden sm:block">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <div class="flex items-center justify-between gap-4 text-xs">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="text-base">🎓</span>
-              <span class="font-semibold text-white truncate">
+          <!-- Brand -->
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="relative shrink-0">
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-500/30 ring-glow">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5"/>
+                  <path d="M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <span class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-amber-400 rounded-full border-2 border-teal-950 pulse-dot"></span>
+            </div>
+            <div class="min-w-0">
+              <div class="font-display font-extrabold text-white text-sm sm:text-base leading-tight truncate tracking-tight">
                 Global Wealth University
-              </span>
-              <span class="text-gray-500 hidden md:inline">|</span>
-              <span class="text-gray-400 hidden md:inline truncate">
-                Department of Computer Science
-              </span>
+              </div>
+              <div class="text-[10px] sm:text-xs text-teal-300/70 tracking-wide">
+                Notice Board · <span class="text-amber-400/90 font-medium">MAINTENANCE MODE</span>
+              </div>
             </div>
-            <div class="text-gray-400 whitespace-nowrap hidden md:block">
-              Official Notice Board
-            </div>
+          </div>
+
+          <!-- Status pill -->
+          <div class="hidden sm:flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1.5">
+            <span class="pulse-dot w-2 h-2 bg-amber-400 rounded-full"></span>
+            <span class="text-amber-300 font-semibold text-[11px] tracking-wide uppercase">Upgrading</span>
           </div>
         </div>
       </div>
-
-      <!-- NAVBAR -->
-      <nav class="bg-uou text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between items-center h-16 gap-3">
-
-            <!-- Brand -->
-            <a href="{% url 'dashboard' %}" class="flex items-center gap-3 min-w-0 flex-shrink">
-              <div class="w-11 h-11 bg-white rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-                <img src="{% static 'img/Global-wealth-university.PNG' %}"
-                     alt="GWU Logo"
-                     class="w-full h-full object-contain p-0.5">
-              </div>
-              <div class="min-w-0 hidden xs:block sm:block">
-                <div class="font-bold text-sm sm:text-lg leading-tight truncate">Global Wealth University</div>
-                <div class="text-xs text-indigo-200">Notice Board</div>
-              </div>
-            </a>
-
-            <!-- Desktop menu -->
-            <div class="hidden md:flex items-center gap-4 shrink-0">
-              <a href="{% url 'dashboard' %}" class="hover:text-indigo-200 text-sm whitespace-nowrap">Home</a>
-
-              {% if user.is_authenticated and user.is_staff %}
-                <a href="{% url 'admin_dashboard' %}" class="hover:text-indigo-200 text-sm whitespace-nowrap">
-                  Admin Panel
-                </a>
-              {% endif %}
-
-              {% if user.is_authenticated %}
-                <span class="text-sm text-indigo-200 truncate max-w-[120px]">
-                  Hi, {{ user.username }}
-                </span>
-                <form method="post" action="{% url 'account_logout' %}" class="inline">
-                  {% csrf_token %}
-                  <button class="bg-white text-uou px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-100 whitespace-nowrap">
-                    Logout
-                  </button>
-                </form>
-              {% else %}
-                <a href="{% url 'account_login' %}"
-                   class="bg-white text-uou px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-100 whitespace-nowrap">
-                  Login
-                </a>
-              {% endif %}
-            </div>
-
-            <!-- Mobile: quick action + hamburger -->
-            <div class="flex md:hidden items-center gap-2 shrink-0">
-              {% if user.is_authenticated %}
-                <form method="post" action="{% url 'account_logout' %}" class="inline">
-                  {% csrf_token %}
-                  <button class="bg-white text-uou px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-indigo-100 whitespace-nowrap">
-                    Logout
-                  </button>
-                </form>
-              {% else %}
-                <a href="{% url 'account_login' %}"
-                   class="bg-white text-uou px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-indigo-100 whitespace-nowrap">
-                  Login
-                </a>
-              {% endif %}
-
-              <button type="button" id="mobile-menu-toggle"
-                      aria-label="Open menu"
-                      class="p-1.5 rounded-lg hover:bg-uou-dark focus:outline-none">
-                <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Mobile dropdown -->
-        <div id="mobile-menu" class="md:hidden hidden bg-uou-dark border-t border-indigo-700">
-          <div class="px-4 py-3 space-y-1">
-
-            {% if user.is_authenticated %}
-              <div class="text-sm text-indigo-200 px-3 py-2 border-b border-indigo-700 mb-2">
-                Signed in as <strong class="text-white">{{ user.username }}</strong>
-              </div>
-            {% endif %}
-
-            <a href="{% url 'dashboard' %}"
-               class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
-              🏠 Home
-            </a>
-
-            {% if user.is_authenticated and user.is_staff %}
-              <a href="{% url 'admin_dashboard' %}"
-                 class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
-                ⚙️ Admin Panel
-              </a>
-              <a href="{% url 'manage_notices' %}"
-                 class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
-                📋 Manage Notices
-              </a>
-              <a href="{% url 'category_list' %}"
-                 class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
-                🏷️ Categories
-              </a>
-            {% endif %}
-
-            {% if user.is_authenticated %}
-              <form method="post" action="{% url 'account_logout' %}" class="pt-1">
-                {% csrf_token %}
-                <button type="submit"
-                        class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium bg-white text-uou hover:bg-indigo-100">
-                  🚪 Logout
-                </button>
-              </form>
-            {% else %}
-              <a href="{% url 'account_login' %}"
-                 class="block px-3 py-2.5 rounded-lg text-sm font-medium bg-white text-uou hover:bg-indigo-100">
-                🔐 Login
-              </a>
-              <a href="{% url 'account_signup' %}"
-                 class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-uou text-white">
-                ✍️ Sign Up
-              </a>
-            {% endif %}
-
-          </div>
-        </div>
-      </nav>
-
-      {% if messages %}
-        <div class="max-w-7xl mx-auto px-4 w-full">
-          {% for message in messages %}
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-3 rounded mt-4 mb-2 break-words">
-              {{ message }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
-      <!-- MAIN (grows to push footer down when content is short) -->
-      <main class="page-main overflow-x-hidden">
-        {% block content %}{% endblock %}
-      </main>
-
-      <!-- FOOTER (always at bottom, scrolls with content when long) -->
-      <footer class="bg-gray-800 text-gray-300 py-6">
-        <div class="max-w-7xl mx-auto px-4 text-center text-sm">
-          © {% now "Y" %} Global Wealth University — Departmental Notice Board
-        </div>
-      </footer>
-
     </div>
-    <!-- End Page Wrapper -->
+
+    <!-- MAIN CONTENT -->
+    <main class="relative ambient-bg min-h-[calc(100vh-65px)] flex items-center justify-center overflow-hidden">
+      
+      <!-- Grid overlay -->
+      <div class="absolute inset-0 grid-overlay pointer-events-none"></div>
+
+      <!-- Floating orbs -->
+      <div class="absolute top-20 left-10 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl float-soft pointer-events-none"></div>
+      <div class="absolute bottom-20 right-10 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl float-soft pointer-events-none" style="animation-delay: 2s;"></div>
+
+      <!-- Rotating ring decoration -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] sm:w-[800px] sm:h-[800px] rounded-full border border-teal-500/5 spin-slow pointer-events-none">
+        <div class="absolute top-0 left-1/2 w-2 h-2 -translate-x-1/2 -translate-y-1/2 bg-teal-400/60 rounded-full"></div>
+        <div class="absolute bottom-0 left-1/2 w-1.5 h-1.5 -translate-x-1/2 translate-y-1/2 bg-amber-400/60 rounded-full"></div>
+      </div>
+
+      <div class="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+
+        <!-- MAIN CARD -->
+        <div class="relative card-glow rounded-3xl bg-gradient-to-b from-teal-950/80 to-teal-950/40 backdrop-blur-xl border border-teal-500/15 p-6 sm:p-10 overflow-hidden">
+          
+          <!-- Corner accents -->
+          <div class="corner-accent top-4 left-4 border-t-2 border-l-2 rounded-tl-lg pointer-events-none"></div>
+          <div class="corner-accent bottom-4 right-4 border-b-2 border-r-2 rounded-br-lg pointer-events-none"></div>
+
+          <!-- Shimmer effect -->
+          <div class="absolute inset-0 shimmer pointer-events-none"></div>
+
+          <!-- Icon -->
+          <div class="flex justify-center mb-6 sm:mb-8">
+            <div class="relative">
+              <div class="absolute inset-0 bg-teal-400/30 blur-2xl rounded-full"></div>
+              <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-teal-400 via-teal-500 to-teal-700 flex items-center justify-center rotate-3 shadow-2xl shadow-teal-500/40">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 sm:w-12 sm:h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status label -->
+          <div class="flex justify-center mb-4">
+            <span class="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-1.5">
+              <span class="w-1.5 h-1.5 bg-amber-400 rounded-full pulse-dot"></span>
+              <span class="text-amber-300 font-bold text-[10px] sm:text-xs tracking-widest uppercase">System Upgrade in Progress</span>
+            </span>
+          </div>
+
+          <!-- Headline -->
+          <h1 class="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center tracking-tight mb-4 leading-tight">
+            Something <span class="teal-gradient-text">Powerful</span><br class="hidden sm:block">
+            Is Being Built
+          </h1>
+
+          <p class="text-sm sm:text-base text-teal-200/70 text-center max-w-xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+            The Global Wealth University Notice Board is being upgraded with a faster, smarter, and more secure experience. We'll be back before you know it.
+          </p>
+
+          <!-- COUNTDOWN WITH DAYS -->
+          <div class="mb-8 sm:mb-10">
+            <p class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-teal-400/70 text-center mb-5">
+              Estimated Time Remaining
+            </p>
+
+            <div class="flex items-center justify-center gap-1.5 sm:gap-3" id="countdown">
+              <!-- Days -->
+              <div class="flex flex-col items-center">
+                <div class="relative day-pulse bg-gradient-to-b from-amber-900/60 to-amber-950/60 rounded-2xl w-[68px] h-[68px] sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center border border-amber-500/35 scan-line overflow-hidden">
+                  <span id="days" class="text-2xl sm:text-4xl md:text-5xl font-black text-amber-300 gold-glow font-display tabular-nums">10</span>
+                </div>
+                <span class="text-[9px] sm:text-[11px] text-amber-400/70 uppercase tracking-[0.2em] mt-2.5 font-bold">Days</span>
+              </div>
+
+              <span class="text-lg sm:text-2xl md:text-3xl font-black text-teal-500/40 -mt-7 select-none">:</span>
+
+              <!-- Hours -->
+              <div class="flex flex-col items-center">
+                <div class="relative bg-gradient-to-b from-teal-900/80 to-teal-950/80 rounded-2xl w-[68px] h-[68px] sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center border border-teal-500/25 scan-line overflow-hidden">
+                  <span id="hours" class="text-2xl sm:text-4xl md:text-5xl font-black text-white teal-glow font-display tabular-nums">00</span>
+                </div>
+                <span class="text-[9px] sm:text-[11px] text-teal-400/60 uppercase tracking-[0.2em] mt-2.5 font-bold">Hours</span>
+              </div>
+
+              <span class="text-lg sm:text-2xl md:text-3xl font-black text-teal-500/40 -mt-7 select-none">:</span>
+
+              <!-- Minutes -->
+              <div class="flex flex-col items-center">
+                <div class="relative bg-gradient-to-b from-teal-900/80 to-teal-950/80 rounded-2xl w-[68px] h-[68px] sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center border border-teal-500/25 scan-line overflow-hidden">
+                  <span id="minutes" class="text-2xl sm:text-4xl md:text-5xl font-black text-white teal-glow font-display tabular-nums">00</span>
+                </div>
+                <span class="text-[9px] sm:text-[11px] text-teal-400/60 uppercase tracking-[0.2em] mt-2.5 font-bold">Minutes</span>
+              </div>
+
+              <span class="text-lg sm:text-2xl md:text-3xl font-black text-teal-500/40 -mt-7 select-none">:</span>
+
+              <!-- Seconds -->
+              <div class="flex flex-col items-center">
+                <div class="relative bg-gradient-to-b from-teal-900/80 to-teal-950/80 rounded-2xl w-[68px] h-[68px] sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center border border-teal-500/25 scan-line overflow-hidden">
+                  <span id="seconds" class="text-2xl sm:text-4xl md:text-5xl font-black text-amber-400 gold-glow font-display tabular-nums">00</span>
+                </div>
+                <span class="text-[9px] sm:text-[11px] text-amber-400/70 uppercase tracking-[0.2em] mt-2.5 font-bold">Seconds</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="mb-8">
+            <div class="flex items-center justify-between text-[10px] sm:text-xs text-teal-400/60 mb-2 font-semibold tracking-wider">
+              <span>UPGRADE PROGRESS</span>
+              <span id="progressPercent" class="text-amber-400">0%</span>
+            </div>
+            <div class="w-full bg-teal-950/80 rounded-full h-2 overflow-hidden border border-teal-500/20">
+              <div id="progressBar" class="relative bg-gradient-to-r from-teal-500 via-teal-400 to-amber-400 h-2 rounded-full transition-all duration-1000 ease-linear" style="width: 0%">
+                <div class="absolute inset-0 bg-white/20 shimmer"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature pills -->
+          <div class="grid grid-cols-3 gap-2 sm:gap-3">
+            <div class="flex flex-col items-center text-center bg-teal-950/50 rounded-xl border border-teal-500/15 p-3 sm:p-4">
+              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-teal-500/15 flex items-center justify-center mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                </svg>
+              </div>
+              <span class="text-[10px] sm:text-xs font-bold text-white">Faster</span>
+              <span class="text-[9px] text-teal-400/50 mt-0.5 hidden sm:block">Load times</span>
+            </div>
+            <div class="flex flex-col items-center text-center bg-teal-950/50 rounded-xl border border-teal-500/15 p-3 sm:p-4">
+              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-amber-500/15 flex items-center justify-center mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span class="text-[10px] sm:text-xs font-bold text-white">Data Safe</span>
+              <span class="text-[9px] text-teal-400/50 mt-0.5 hidden sm:block">100% preserved</span>
+            </div>
+            <div class="flex flex-col items-center text-center bg-teal-950/50 rounded-xl border border-teal-500/15 p-3 sm:p-4">
+              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-teal-500/15 flex items-center justify-center mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              </div>
+              <span class="text-[10px] sm:text-xs font-bold text-white">Secure</span>
+              <span class="text-[9px] text-teal-400/50 mt-0.5 hidden sm:block">Enhanced</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom note -->
+        <div class="text-center mt-8 space-y-2">
+          <p class="text-xs sm:text-sm text-teal-300/50">
+            Need urgent assistance? Contact the ICT Helpdesk.
+          </p>
+          <p class="text-[10px] sm:text-xs text-teal-400/30 font-medium tracking-wide">
+            © {% now "Y" %} GLOBAL WEALTH UNIVERSITY · DEPARTMENTAL NOTICE BOARD
+          </p>
+        </div>
+
+      </div>
+    </main>
 
   </div>
-  <!-- End Scroll Container -->
-
-  <script src="{% static 'js/main.js' %}"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // ============================================================
-      // MOBILE MENU TOGGLE
+      // COUNTDOWN TIMER — 10 DAYS
       // ============================================================
-      const toggle = document.getElementById('mobile-menu-toggle');
-      const menu = document.getElementById('mobile-menu');
-      const hamburger = document.getElementById('hamburger-icon');
-      const closeIcon = document.getElementById('close-icon');
+      const TEN_DAYS_IN_SECONDS = 10 * 24 * 60 * 60; // 864,000 seconds
+      let remainingSeconds = TEN_DAYS_IN_SECONDS;
+      const totalSeconds = TEN_DAYS_IN_SECONDS;
 
-      if (toggle && menu) {
-        toggle.addEventListener('click', () => {
-          const isOpen = !menu.classList.contains('hidden');
-          menu.classList.toggle('hidden', isOpen);
-          hamburger.classList.toggle('hidden', !isOpen);
-          closeIcon.classList.toggle('hidden', isOpen);
-        });
+      const daysEl = document.getElementById('days');
+      const hoursEl = document.getElementById('hours');
+      const minutesEl = document.getElementById('minutes');
+      const secondsEl = document.getElementById('seconds');
+      const progressBar = document.getElementById('progressBar');
+      const progressPercent = document.getElementById('progressPercent');
 
-        document.addEventListener('click', (e) => {
-          if (!menu.classList.contains('hidden')
-              && !menu.contains(e.target)
-              && !toggle.contains(e.target)) {
-            menu.classList.add('hidden');
-            hamburger.classList.remove('hidden');
-            closeIcon.classList.add('hidden');
-          }
-        });
+      function pad(num, size = 2) {
+        return String(num).padStart(size, '0');
       }
+
+      // Track previous seconds to animate digit changes
+      let prevSecs = null;
+
+      function updateCountdown() {
+        if (remainingSeconds <= 0) {
+          daysEl.textContent = '00';
+          hoursEl.textContent = '00';
+          minutesEl.textContent = '00';
+          secondsEl.textContent = '00';
+          if (progressBar) progressBar.style.width = '100%';
+          if (progressPercent) progressPercent.textContent = '100%';
+
+          const headline = document.querySelector('h1');
+          if (headline) {
+            headline.innerHTML = '<span class="teal-gradient-text">Upgrade Complete</span>';
+          }
+          const statusLabel = document.querySelector('.text-amber-300');
+          if (statusLabel) {
+            statusLabel.textContent = 'System Online';
+            statusLabel.classList.remove('text-amber-300');
+            statusLabel.classList.add('text-teal-300');
+          }
+          const pulseDots = document.querySelectorAll('.pulse-dot');
+          pulseDots.forEach(dot => {
+            dot.classList.remove('bg-amber-400');
+            dot.classList.add('bg-teal-400');
+          });
+          return;
+        }
+
+        const days = Math.floor(remainingSeconds / 86400);
+        const hrs = Math.floor((remainingSeconds % 86400) / 3600);
+        const mins = Math.floor((remainingSeconds % 3600) / 60);
+        const secs = remainingSeconds % 60;
+
+        daysEl.textContent = pad(days);
+        hoursEl.textContent = pad(hrs);
+        minutesEl.textContent = pad(mins);
+        secondsEl.textContent = pad(secs);
+
+        // Animate seconds flip
+        if (prevSecs !== null && prevSecs !== secs) {
+          secondsEl.classList.remove('digit-flip');
+          void secondsEl.offsetWidth;
+          secondsEl.classList.add('digit-flip');
+        }
+        prevSecs = secs;
+
+        // Progress: 0% at start, 100% at completion
+        const elapsed = totalSeconds - remainingSeconds;
+        const percent = (elapsed / totalSeconds) * 100;
+        if (progressBar) progressBar.style.width = percent + '%';
+        if (progressPercent) progressPercent.textContent = Math.floor(percent) + '%';
+
+        remainingSeconds--;
+      }
+
+      updateCountdown();
+      const interval = setInterval(updateCountdown, 1000);
+      window.addEventListener('beforeunload', () => clearInterval(interval));
 
       // ============================================================
       // iOS OVERSCROLL MANAGEMENT
@@ -389,7 +587,6 @@
           }, { passive: false });
         }
 
-        // Scroll boundary indicator
         scrollContainer.addEventListener('scroll', function() {
           const distanceFromBottom = this.scrollHeight - (this.scrollTop + this.clientHeight);
           const boundary = document.getElementById('scrollBoundary');
